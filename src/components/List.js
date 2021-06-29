@@ -6,35 +6,17 @@ import { InfinityScroll } from "../components/InfinityScroll";
 const List = (props) => {
   const { history, keyword } = props;
   const [pages, setPages] = useState(0);
-  const [info, setInfo] = useState([]);
-  const [is_first, setFirst] = useState(false);
-  const [is_last, setLast] = useState(false);
+  // const [info, setInfo] = useState([]);
+  const observer = useRef();
   const [difficult, setDifficult] = useState("a");
-  const viewport = useRef(null);
-  const target = useRef(null);
+  const [info, setInfo] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [is_last, setisLast] = useState(false);
+  const [target, setTarget] = useState(null);
 
-  // useEffect(() => {
-  //   console.log("2");
-  //   setLast(false);
-  //   setPages(0);
-  //   const get_DB = {
-  //     url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=0&search=${keyword}`,
-  //     method: "GET",
-  //   };
-  //   axios(get_DB)
-  //     .then((res) => {
-  //       setInfo(res.data);
-  //       setPages((prevState) => prevState + 1);
-  //       // console.log(res);
-  //       // console.log(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, [keyword]);
-
-  useEffect(() => {    
-    setLast(false);
+  useEffect(() => {
     setPages(0);
     const get_DB = {
       url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=0&search=${keyword}`,
@@ -42,7 +24,6 @@ const List = (props) => {
     };
     axios(get_DB)
       .then((res) => {
-        setFirst(true)
         setInfo(res.data);
         setPages((prevState) => prevState + 1);
       })
@@ -51,62 +32,18 @@ const List = (props) => {
       });
   }, [difficult, keyword]);
 
-  // InfinityScroll({
-  //   target,
-  //   onIntersect: ([{ isIntersecting }]) => {
-  //     if (isIntersecting) {
-  //       if(info.length===0){
-  //         console.log("123")
-  //         return;
-  //       }
-  //       if (is_last) {
-  //         return;
-  //       }
-  //       console.log("456")
-        // const get_DB = {
-        //   url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=${pages}&search=${keyword}`,
-        //   method: "GET",
-        // };
-        // axios(get_DB)
-        //   .then((res) => {
-        //     if (res.data.length === 0) {
-        //       setLast(true);
-        //       return;
-        //     }
-        //     setInfo((prevState) => [...prevState, ...res.data]);
-        //     setPages((prevState) => prevState + 1);
-        //     // console.log(res);
-        //     // console.log(res.data);
-        //   })
-        //   .catch((err) => {
-        //     console.log(err);
-        //   });
-  //     }
-  //   },
-  // });
-
-
-
-  useEffect(() => {
-    const options = {
-      root: viewport.current,
-      threshold: 0,
-    };
-
-    const handleIntersection = (entries, observer) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-        console.log("456")
+  InfinityScroll({
+    target,
+    onIntersect: ([{ isIntersecting }]) => {
+      if (isIntersecting) {
         const get_DB = {
           url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=${pages}&search=${keyword}`,
           method: "GET",
         };
         axios(get_DB)
           .then((res) => {
+            console.log(res);
             if (res.data.length === 0) {
-              setLast(true);
               return;
             }
             setInfo((prevState) => [...prevState, ...res.data]);
@@ -117,27 +54,9 @@ const List = (props) => {
           .catch((err) => {
             console.log(err);
           });
-        observer.unobserve(entry.target);
-        observer.observe(target.current);
-      });
-    };
-
-    const io = new IntersectionObserver(handleIntersection, options);
-
-    if (target.current) {
-      io.observe(target.current);
-    }
-
-    return () => io && io.disconnect();
-  }, [viewport, target]);
-
-
-
-
-
-
-
-
+      }
+    },
+  });
 
   const clickA = () => {
     if (difficult === "a") {
@@ -165,33 +84,40 @@ const List = (props) => {
           B Post
         </TabB>
       </TabWrap>
-      <div ref={viewport}>
+      <>
         {info &&
           info.map((p, idx) => {
-            return (
-              <Fragment key={idx}>
-                <Wrap onClick={() => history.push(`/${p.type}/${p.id}`)}>
-                  <PostTitle>
-                    {p.id}.{p.title}
-                  </PostTitle>
-                  <PostDesc>{p.content}</PostDesc>
-                </Wrap>
-              </Fragment>
-            );
+            if (idx + 1 === info.length) {
+              return (
+                <Fragment key={idx}>
+                  <Wrap
+                    onClick={() => history.push(`/${p.type}/${p.id}`)}
+                    ref={setTarget}
+                  >
+                    <PostTitle>
+                      {p.id}.{p.title}
+                    </PostTitle>
+                    <PostDesc>{p.content}</PostDesc>
+                  </Wrap>
+                </Fragment>
+              );
+            } else {
+              return (
+                <Fragment key={idx}>
+                  <Wrap onClick={() => history.push(`/${p.type}/${p.id}`)}>
+                    <PostTitle>
+                      {p.id}.{p.title}
+                    </PostTitle>
+                    <PostDesc>{p.content}</PostDesc>
+                  </Wrap>
+                </Fragment>
+              );
+            }
           })}
-      </div>
-      <div ref={target}>123</div>
+      </>
     </>
   );
 };
-
-// const Last 
-
-const Div = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: ${(props) => props.height}px;
-`;
 
 const TabWrap = styled.div`
   display: flex;
