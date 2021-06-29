@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { InfinityScroll } from "../components/InfinityScroll";
@@ -6,18 +6,15 @@ import { InfinityScroll } from "../components/InfinityScroll";
 const List = (props) => {
   const { history, keyword } = props;
   const [pages, setPages] = useState(0);
-  // const [info, setInfo] = useState([]);
-  const observer = useRef();
   const [difficult, setDifficult] = useState("a");
   const [info, setInfo] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [hasMore, setHasMore] = useState(false);
-  const [is_last, setisLast] = useState(false);
+  const [is_last, setisLast] = useState(true);
   const [target, setTarget] = useState(null);
 
   useEffect(() => {
     setPages(0);
+    setisLast(false)
+    console.log("123")
     const get_DB = {
       url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=0&search=${keyword}`,
       method: "GET",
@@ -36,14 +33,17 @@ const List = (props) => {
     target,
     onIntersect: ([{ isIntersecting }]) => {
       if (isIntersecting) {
+        if(is_last){
+          return;
+        }
         const get_DB = {
           url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=${pages}&search=${keyword}`,
           method: "GET",
         };
         axios(get_DB)
           .then((res) => {
-            console.log(res);
             if (res.data.length === 0) {
+              setisLast(true)
               return;
             }
             setInfo((prevState) => [...prevState, ...res.data]);

@@ -21,7 +21,7 @@ const Detail = (props) => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [props.match.params.id, props.match.params.type]);
 
   return (
     <Container>
@@ -38,7 +38,6 @@ const Detail = (props) => {
       ) : (
         <></>
       )}
-
       <Bottom>
         <Button onClick={() => history.goBack()}>뒤로 가기</Button>
       </Bottom>

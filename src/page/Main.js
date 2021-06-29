@@ -11,7 +11,6 @@ const Main = (props) => {
   const search = useRef();
 
   useEffect(() => {
-    console.log(props)
     const timer1 = setTimeout(() => setKeyword(keyvalue), 150);
     return () => clearTimeout(timer1);
   }, [keyvalue]);
@@ -48,7 +47,7 @@ const Main = (props) => {
 const Search = styled.input`
   border: none;
   outline: none;
-  width: auto;
+  width: 100%;
   margin-left: 5px;
 `;
 
@@ -62,6 +61,9 @@ const SearchWrapper = styled.div`
   align-items: center;
   & svg {
     width: auto;
+  }
+  :focus-within{
+    border: 2px solid rgb(43, 97, 225, 0.6);
   }
 `;
 
