@@ -11,6 +11,7 @@ const Main = (props) => {
   const search = useRef();
 
   useEffect(() => {
+    console.log(props)
     const timer1 = setTimeout(() => setKeyword(keyvalue), 150);
     return () => clearTimeout(timer1);
   }, [keyvalue]);
@@ -82,11 +83,8 @@ const Title = styled.div`
   display: flex;
   width: auto;
   width: 100%;
-  margin-right: 10px;
   justify-content: center;
-  & img {
-    /* width: 1rem; */
-  }
+  user-select: none;
 `;
 
 const Top = styled.div`

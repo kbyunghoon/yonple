@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
+import Logo from "../media/logo.png";
 
 const Detail = (props) => {
   const { history } = props;
@@ -24,24 +25,42 @@ const Detail = (props) => {
 
   return (
     <Container>
+      <LogoImg>
+        <img src={Logo} alt="logo" />
+      </LogoImg>
       {data ? (
         <Wrap>
-          <Title>{data.title}</Title>
-          <Desc>{data.content}</Desc>
+          <TextWrap>
+            <Title>{data.title}</Title>
+            <Desc>{data.content}</Desc>
+          </TextWrap>
         </Wrap>
       ) : (
         <></>
       )}
 
       <Bottom>
-        <Button onClick={()=>history.go(-1)}>뒤로 가기</Button>
+        <Button onClick={() => history.goBack()}>뒤로 가기</Button>
       </Bottom>
     </Container>
   );
 };
 
+const TextWrap = styled.div`
+  margin: 20px 20px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const LogoImg = styled.div`
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+`;
+
 const Container = styled.div`
-  width: 60%;
+  width: 70%;
   margin: 0 auto;
 `;
 
@@ -51,7 +70,14 @@ const Wrap = styled.div`
 `;
 
 const Title = styled.div`
+  display: flex;
+  font-size: 25px;
   margin: 0 auto;
+  line-break: loose;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 2rem;
 `;
 
 const Desc = styled.div`
@@ -67,7 +93,7 @@ const Button = styled.button`
   margin-top: 10px;
   cursor: pointer;
   font-family: "paybooc-Bold";
-  font-size: 1rem;
+  font-size: 18px;
   color: #ffffff;
   background-color: #2baae1;
   box-shadow: 0px 3px 6px #00000029;
