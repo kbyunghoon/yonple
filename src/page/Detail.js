@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import Logo from "../media/logo.png";
+import { DETAIL } from "../redux/modules/post";
+import { useDispatch } from "react-redux";
 
 const Detail = (props) => {
   const { history } = props;
   const [data, setData] = useState();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const type = props.match.params.type;
@@ -22,6 +25,10 @@ const Detail = (props) => {
         console.log(err);
       });
   }, [props.match.params.id, props.match.params.type]);
+
+  useEffect(() => {
+    dispatch(DETAIL(true));
+  }, []);
 
   return (
     <Container>

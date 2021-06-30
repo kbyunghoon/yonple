@@ -2,26 +2,43 @@ import React, { useEffect, useState, Fragment } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { InfinityScroll } from "../components/InfinityScroll";
+import {
+  GET_POST,
+  SHIFT_POST,
+  KEYWORD,
+  DIFFICULT,
+  DETAIL,
+} from "../redux/modules/post";
+import { useDispatch, useSelector } from "react-redux";
 
 const List = (props) => {
   const { history, keyword } = props;
   const [pages, setPages] = useState(0);
-  const [difficult, setDifficult] = useState("a");
-  const [info, setInfo] = useState([]);
+  const difficult = useSelector((state) => state.post.difficult);
+  const info = useSelector((state) => state.post.post_list);
   const [is_last, setisLast] = useState(true);
   const [target, setTarget] = useState(null);
+  const detail = useSelector((state) => state.post.detail);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    if (detail) {
+      dispatch(DETAIL(false));
+      return;
+    }
     setPages(0);
-    setisLast(false)
-    console.log("123")
+    setisLast(false);
     const get_DB = {
       url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=0&search=${keyword}`,
       method: "GET",
     };
     axios(get_DB)
       .then((res) => {
-        setInfo(res.data);
+        const data = {
+          data: res.data,
+        };
+        dispatch(GET_POST(data));
         setPages((prevState) => prevState + 1);
       })
       .catch((err) => {
@@ -33,7 +50,7 @@ const List = (props) => {
     target,
     onIntersect: ([{ isIntersecting }]) => {
       if (isIntersecting) {
-        if(is_last){
+        if (is_last) {
           return;
         }
         const get_DB = {
@@ -43,13 +60,14 @@ const List = (props) => {
         axios(get_DB)
           .then((res) => {
             if (res.data.length === 0) {
-              setisLast(true)
+              setisLast(true);
               return;
             }
-            setInfo((prevState) => [...prevState, ...res.data]);
+            const data = {
+              data: res.data,
+            };
+            dispatch(SHIFT_POST(data));
             setPages((prevState) => prevState + 1);
-            // console.log(res);
-            // console.log(res.data);
           })
           .catch((err) => {
             console.log(err);
@@ -62,7 +80,7 @@ const List = (props) => {
     if (difficult === "a") {
       return;
     } else {
-      setDifficult("a");
+      dispatch(DIFFICULT("a"));
     }
   };
 
@@ -70,7 +88,7 @@ const List = (props) => {
     if (difficult === "b") {
       return;
     } else {
-      setDifficult("b");
+      dispatch(DIFFICULT("b"));
     }
   };
 
