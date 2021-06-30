@@ -5,20 +5,20 @@ import { InfinityScroll } from "../components/InfinityScroll";
 import {
   GET_POST,
   SHIFT_POST,
-  KEYWORD,
   DIFFICULT,
   DETAIL,
+  IS_LAST,
 } from "../redux/modules/post";
 import { useDispatch, useSelector } from "react-redux";
 
 const List = (props) => {
   const { history, keyword } = props;
-  const [pages, setPages] = useState(0);
   const difficult = useSelector((state) => state.post.difficult);
   const info = useSelector((state) => state.post.post_list);
-  const [is_last, setisLast] = useState(true);
-  const [target, setTarget] = useState(null);
+  const page = useSelector((state) => state.post.page);
   const detail = useSelector((state) => state.post.detail);
+  const is_last = useSelector((state) => state.post.IS_LAST);
+  const [target, setTarget] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -27,8 +27,6 @@ const List = (props) => {
       dispatch(DETAIL(false));
       return;
     }
-    setPages(0);
-    setisLast(false);
     const get_DB = {
       url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=0&search=${keyword}`,
       method: "GET",
@@ -37,9 +35,9 @@ const List = (props) => {
       .then((res) => {
         const data = {
           data: res.data,
+          page: 1,
         };
         dispatch(GET_POST(data));
-        setPages((prevState) => prevState + 1);
       })
       .catch((err) => {
         console.log(err);
@@ -54,20 +52,20 @@ const List = (props) => {
           return;
         }
         const get_DB = {
-          url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=${pages}&search=${keyword}`,
+          url: `https://recruit-api.yonple.com/recruit/869201/${difficult}-posts?page=${page}&search=${keyword}`,
           method: "GET",
         };
         axios(get_DB)
           .then((res) => {
             if (res.data.length === 0) {
-              setisLast(true);
+              dispatch(IS_LAST(true));
               return;
             }
             const data = {
               data: res.data,
+              page: page + 1,
             };
             dispatch(SHIFT_POST(data));
-            setPages((prevState) => prevState + 1);
           })
           .catch((err) => {
             console.log(err);
