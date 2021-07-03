@@ -42,7 +42,7 @@ const List = (props) => {
       .catch((err) => {
         console.log(err);
       });
-  }, [difficult, keyword]);
+  }, [dispatch, detail, difficult, keyword]);
 
   InfinityScroll({
     target,

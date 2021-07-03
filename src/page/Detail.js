@@ -28,7 +28,7 @@ const Detail = (props) => {
 
   useEffect(() => {
     dispatch(DETAIL(true));
-  }, []);
+  }, [dispatch]);
 
   return (
     <Container>
